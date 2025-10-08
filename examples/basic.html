@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MiniReactive Demo</title>
+</head>
+<body>
+  <script src="../dist/mini-reactive.js"></script>
+  <h2>MiniReactive Demo</h2>
+
+  <input v-model="name" placeholder="Enter name" />
+  <p>Hello, <span data-bind="name"></span>!</p>
+
+  <input v-model="age" type="number" placeholder="Enter age" />
+  <p>You are <span data-bind="age"></span> years old.</p>
+
+  <script>
+
+    const state = MiniReactive.createReactive({
+      name: 'Vincent',
+      age: 28,
+    });
+
+    // Update programmatically
+    setTimeout(() => {
+      state.name = 'Alice';
+      state.age = 30;
+    }, 3000);
+  </script>
+</body>
+</html>

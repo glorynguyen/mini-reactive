@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MiniReactive — Shopping Cart Demo</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 2rem;
+      background: #f8f9fa;
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+    }
+
+    .cart {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .item:last-child {
+      border-bottom: none;
+    }
+
+    .item input {
+      width: 60px;
+      text-align: center;
+      padding: 4px;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .total {
+      margin-top: 1rem;
+      font-weight: bold;
+      font-size: 1.2rem;
+      text-align: right;
+    }
+
+    .add-item {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .add-item input {
+      flex: 1;
+      padding: 6px;
+    }
+  </style>
+</head>
+<body>
+    <script src="../dist/mini-reactive.js"></script>
+  <div class="cart">
+    <h2>🛒 MiniReactive Shopping Cart</h2>
+    <div id="cartItems"></div>
+    <p class="total">Total: $<span data-bind="total"></span></p>
+
+    <div class="add-item">
+      <input id="newName" placeholder="Item name" />
+      <input id="newPrice" type="number" placeholder="Price" />
+      <button id="addBtn">Add Item</button>
+    </div>
+  </div>
+
+  <script>
+
+    const state = MiniReactive.createReactive({
+      cart: [
+        { name: 'Apple', price: 2, qty: 3 },
+        { name: 'Banana', price: 1.5, qty: 4 },
+      ],
+      total: 0,
+    });
+
+    function updateTotal() {
+      state.total = state.cart.reduce((sum, item) => sum + item.price * item.qty, 0).toFixed(2);
+    }
+
+    const cartContainer = document.getElementById('cartItems');
+    function renderCart() {
+      cartContainer.innerHTML = '';
+      state.cart.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `
+          <span>${item.name}</span>
+          <span>$${item.price}</span>
+          <input type="number" min="1" value="${item.qty}" data-index="${index}" />
+          <span>$${(item.price * item.qty).toFixed(2)}</span>
+          <button data-remove="${index}">🗑️</button>
+        `;
+        cartContainer.appendChild(div);
+      });
+      updateTotal();
+    }
+
+    cartContainer.addEventListener('input', (e) => {
+      if (e.target.matches('input[type="number"]')) {
+        const index = e.target.dataset.index;
+        state.cart[index].qty = Number(e.target.value);
+        renderCart();
+      }
+    });
+
+    cartContainer.addEventListener('click', (e) => {
+      if (e.target.dataset.remove) {
+        const index = e.target.dataset.remove;
+        state.cart.splice(index, 1);
+        renderCart();
+      }
+    });
+
+    document.getElementById('addBtn').addEventListener('click', () => {
+      const name = document.getElementById('newName').value.trim();
+      const price = parseFloat(document.getElementById('newPrice').value);
+      if (!name || isNaN(price)) return alert('Please enter a valid item name and price.');
+
+      state.cart.push({ name, price, qty: 1 });
+      document.getElementById('newName').value = '';
+      document.getElementById('newPrice').value = '';
+      renderCart();
+    });
+
+    renderCart();
+
+    updateTotal();
+  </script>
+</body>
+</html>
