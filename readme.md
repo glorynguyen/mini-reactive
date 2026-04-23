@@ -1,7 +1,3 @@
-Of course! Here is a comprehensive and well-structured `README.md` file for your MiniReactive library, written in Markdown format.
-
----
-
 # MiniReactive ⚡️
 
 A tiny, zero-dependency, 2-way data binding library for simple projects.
